@@ -72,5 +72,105 @@
     });
   }
 
-  // Your custom JavaScript goes here
+    // Your custom JavaScript goes here
+    var app = {
+        pageTitle: document.getElementById('page-title')
+    };
+
+    // Change tab
+    document.getElementById("header-tab-menu").addEventListener("click", function(e) {
+        var title = document.getElementById("header-tab-menu")
+            .getElementsByClassName("is-active")[0]
+            .getElementsByTagName("span")[0]
+            .innerHTML;
+        app.pageTitle.innerHTML = title;
+
+        if (title === "Jelajah") {
+            document.getElementById("create-explore").removeAttribute("hidden");
+        } else {
+            document.getElementById("create-explore").setAttribute("hidden", "");
+        }
+
+        if (title === "Lapor") {
+            document.getElementById("create-report").removeAttribute("hidden");
+
+            var dialog = document.querySelector('#donation-dialog');
+            var showDialogButton = document.querySelector('.give-donation');
+            if (! dialog.showModal) {
+                dialogPolyfill.registerDialog(dialog);
+            }
+            showDialogButton.addEventListener('click', function() {
+                dialog.showModal();
+            });
+            dialog.querySelector('.close').addEventListener('click', function() {
+                dialog.close();
+            });
+            var dialog2 = document.querySelector("#donation-confirmation-dialog");
+            var showDialogButton2 = document.querySelector('.show-donation-confirmation-dialog');
+            if (! dialog2.showModal) {
+                dialogPolyfill.registerDialog(dialog2);
+            }
+            showDialogButton2.addEventListener('click', function() {
+                dialog.close();
+                dialog2.showModal();
+            });
+            dialog2.querySelector('.close').addEventListener('click', function() {
+                dialog2.close();
+            });
+        } else {
+            document.getElementById("create-report").setAttribute("hidden", "");
+        }
+    })
+
+    var detailBtn = [].slice.call(document.getElementsByClassName("show-report-detail"));
+    detailBtn.forEach(function(btn) {
+        btn.addEventListener("click", function(e) {
+            var card = e.target.parentNode.parentNode;
+            var detailText = card.getElementsByClassName("mdl-card__supporting-text")[0];
+            // console.log(card);
+            if (detailText.hasAttribute("hidden")) {
+                detailText.removeAttribute("hidden");
+                e.target.innerHTML = "Tutup";
+            } else {
+                detailText.setAttribute("hidden", "true");
+                e.target.innerHTML = "Detail";
+            }
+        });
+    });
+
+    // Vote report to goverment
+    document.getElementsByClassName("vote-report")[0].addEventListener("click", function(e) {
+        e.target.setAttribute("disabled", "");
+        var numVote = e.target.parentNode.getElementsByTagName("span")[0];
+        numVote.innerHTML = parseInt(numVote.innerHTML) + 1;
+    });
+
 })();
+var jelajahMap;
+var locationList = [
+    ["Mall", {lat: -6.2531528, lng: 106.6156402}, "/detail-taman.html"],
+    ["Taman Umum", {lat: -6.253555, lng: 106.622403}, "/detail-taman.html"],
+    ["Pasar Tradisional", {lat: -6.262183, lng: 106.617391}, "/detail-taman"]
+];
+
+function initMap() {
+    jelajahMap = new google.maps.Map(document.getElementById('explore-map'), {
+        center: {lat: -6.2568704, lng: 106.6177493},
+        zoom: 15
+    });
+
+    locationList.forEach(function(loc) {
+        var marker = new google.maps.Marker({
+            title: loc[0],
+            position: loc[1],
+            map: jelajahMap,
+            url: loc[2]
+        });
+        google.maps.event.addListener(marker, 'click', function() {
+            window.location.href = this.url;
+        });
+    });
+    var pageHeight = document.querySelector('.mdl-layout__content').getAttribute('height');
+    console.log(document.querySelector('.mdl-layout__content'));
+    document.getElementById('explore-map').setAttribute("height", pageHeight);
+}
